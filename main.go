@@ -1,5 +1,10 @@
 package main
 
+import "os"
+import "io"
+import "bufio"
+import "unicode"
+
 import (
 	"fmt"
 	"github.com/alexflint/go-arg"
@@ -33,6 +38,8 @@ func gameLoop(args commandLineArgs) {
 	game := snake.NewGame(args.Level)
 	fmt.Printf("Game: %v\n", game)
 
+	readMap(args.Map)
+
 	d, err := display.InitDisplay(resources)
 	if err != nil {
 		return
@@ -53,6 +60,69 @@ func gameLoop(args commandLineArgs) {
 		}
 	}
 
+}
+
+func check(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
+
+func checkN(n, actualN int, e error) {
+	check(e)
+	if n != actualN {
+		panic(fmt.Errorf("%d != expected %d", actualN, n))
+	}
+}
+
+func assert(condition bool, msg string) {
+	if !condition {
+		panic(fmt.Errorf("assertion failed: %s", msg))
+	}
+}
+
+func readMap(filename string) []int8 {
+
+	f, err := os.Open(filename)
+	check(err)
+
+	var width, height int
+	n, err := fmt.Fscanf(f, "%d %d", &width, &height)
+	check(err)
+	assert(n == 2, "invalid size header")
+
+	size := width * height
+	assert(size > 0, "invalid width/height")
+
+	map_ := make([]int8, size)
+
+	reader := bufio.NewReader(f)
+
+	for i := 0; i < size; {
+		b, _, err := reader.ReadRune()
+		if err == io.EOF {
+			panic("premature end of file")
+		}
+
+		if unicode.IsSpace(b) {
+			continue
+		}
+
+		switch b {
+		case '.':
+			map_[i] = (int8)(display.SpriteNone)
+		case '#':
+			map_[i] = (int8)(display.SpriteWall)
+		case 'x':
+			map_[i] = (int8)(display.SpriteInvalid)
+		default:
+			panic("invalid char in map")
+		}
+
+		i++
+	}
+
+	return map_
 }
 
 func main() {
