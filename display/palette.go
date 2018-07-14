@@ -4,6 +4,7 @@ type RGBColor struct {
 	R, G, B uint8
 }
 
+const NumPalettes = 5
 var CurrentPalette = 0
 var PsychedelicMode = 0
 

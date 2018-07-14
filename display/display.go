@@ -11,7 +11,6 @@ const ScreenHeight = 480
 const ScreenBpp = 32
 const GridWidth = 40
 const GridHeight = 30
-const NumPalettes = 5
 
 type Display struct {
 	renderer *sdl.Renderer
