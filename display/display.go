@@ -59,5 +59,15 @@ func InitDisplay(resources core.HoldsDisposables) error {
 	sdl.Delay(20)
 	renderer.Present()
 
+	sprites, err := LoadSprites(renderer, resources)
+	if err != nil {
+		panic(err)
+	}
+	sprites.DrawSprite(SpriteFood, 80, 80)
+
+	// Hack
+	sdl.Delay(20)
+	renderer.Present()
+
 	return nil
 }
