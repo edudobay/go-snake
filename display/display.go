@@ -18,6 +18,19 @@ const NumPalettes = 5
 var CurrentPalette = 0
 var PsychedelicMode = 0
 
+type Display struct {
+	renderer *sdl.Renderer
+	sprites *Sprites
+}
+
+func (d *Display) Update() {
+	d.renderer.Present()
+}
+
+func (d *Display) DrawSprite(id Sprite, x, y int32) {
+	d.sprites.DrawSprite(id, x, y)
+}
+
 func windowResource(window *sdl.Window) core.Resource {
 	return core.DisposableResource(func() {
 		log.Println("Disposing SDL.Window")
@@ -32,21 +45,21 @@ func rendererResource(renderer *sdl.Renderer) core.Resource {
 	})
 }
 
-func InitDisplay(resources core.HoldsDisposables) error {
+func InitDisplay(resources core.HoldsDisposables) (*Display, error) {
 	window, err := sdl.CreateWindow(
 		"Snake",
 		sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED,
 		ScreenWidth, ScreenHeight,
 		sdl.WINDOW_SHOWN)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	resources.AddDisposable(windowResource(window))
 
 	renderer, err := sdl.CreateRenderer(window, -1, 0)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	resources.AddDisposable(rendererResource(renderer))
@@ -63,11 +76,6 @@ func InitDisplay(resources core.HoldsDisposables) error {
 	if err != nil {
 		panic(err)
 	}
-	sprites.DrawSprite(SpriteFood, 80, 80)
 
-	// Hack
-	sdl.Delay(20)
-	renderer.Present()
-
-	return nil
+	return &Display{renderer, sprites}, nil
 }

@@ -33,9 +33,13 @@ func gameLoop(args commandLineArgs) {
 	game := snake.NewGame(args.Level)
 	fmt.Printf("Game: %v\n", game)
 
-	if err := display.InitDisplay(resources); err != nil {
+	d, err := display.InitDisplay(resources)
+	if err != nil {
 		return
 	}
+
+	d.DrawSprite(display.SpriteFood, 80, 80)
+	d.Update()
 
 	quit := false
 	for !quit {
