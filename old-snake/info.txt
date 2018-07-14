@@ -1,0 +1,14 @@
+então, tem duas minhocas, ou cobras, ou enguias, ou o que você quizer, uma se controla pelas setas e a outra ou pelo numpad ou por algum conjunto de letras no teclado, tipo wasd. o objetivo é fazer a outra minhoca bater, mesmo que seja na sua minhoca ou nela mesma. só que no começo você é uma minhoca pequena, então fica dificil "enrolar" (tapar o caminho) da outra
+então você pega maças que te fazem crescer, aparece uma de cada vez e quem pegar primeiro cresce primeiro
+só que de vez em quanto aparece uma banana, que te faz crescer um pouco mais que a maça, mas é raro
+e também tem mapas diferentes, o mais simples as unicas barreiras são os cantos da tela
+mas tem mapas que tem coisas no caminho, que possivelmente até se movimentem
+mas não precisa ser muito complexo, é claro
+se só tiver duas minhocas para jogar juntas ja é divertido o suficiente
+
+*** TODO
+
+- Load a map
+- Text fonts
+- Scoring
+- Fruits
