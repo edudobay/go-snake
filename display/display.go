@@ -11,13 +11,7 @@ const ScreenHeight = 480
 const ScreenBpp = 32
 const GridWidth = 40
 const GridHeight = 30
-const BgColor = 0
 const NumPalettes = 5
-
-var fgColor = []uint8{74, 83, 53}
-
-var CurrentPalette = 0
-var PsychedelicMode = 0
 
 type Display struct {
 	renderer *sdl.Renderer
