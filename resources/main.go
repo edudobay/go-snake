@@ -28,7 +28,7 @@ func imgResource() core.Resource {
     }
 }
 
-func main2() {
+func main() {
     resources := new(core.Resources)
     resources.Init(new(Sdl))
     resources.Init(imgResource())
