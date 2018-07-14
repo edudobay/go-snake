@@ -12,15 +12,16 @@ const ScreenBpp = 32
 const GridWidth = 40
 const GridHeight = 30
 const BgColor = 0
-const FgColor = 1
 const NumPalettes = 5
+
+var fgColor = []uint8{74, 83, 53}
 
 var CurrentPalette = 0
 var PsychedelicMode = 0
 
 type Display struct {
 	renderer *sdl.Renderer
-	sprites *Sprites
+	sprites  *Sprites
 }
 
 func (d *Display) Update() {
@@ -29,6 +30,17 @@ func (d *Display) Update() {
 
 func (d *Display) DrawSprite(id Sprite, x, y int32) {
 	d.sprites.DrawSprite(id, x, y)
+}
+
+func (d *Display) DrawWindow(x, y, w, h int32) {
+	rect := &sdl.Rect{X: x, Y: y, W: w, H: h}
+	d.renderer.SetDrawColorArray(fgColor...)
+	d.renderer.FillRect(rect)
+
+	d.DrawSprite(SpriteBorderUpperLeft, x, y)
+	d.DrawSprite(SpriteBorderUpperRight, x+w-SpriteWidth, y)
+	d.DrawSprite(SpriteBorderLowerRight, x+w-SpriteWidth, y+h-SpriteHeight)
+	d.DrawSprite(SpriteBorderLowerLeft, x, y+h-SpriteHeight)
 }
 
 func windowResource(window *sdl.Window) core.Resource {
