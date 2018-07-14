@@ -38,7 +38,10 @@ func gameLoop(args commandLineArgs) {
 		return
 	}
 
-	d.DrawSprite(display.SpriteFood, 80, 80)
+	map_ := snake.ReadMap(args.Map)
+	board := snake.CreateBoard(map_)
+
+	d.DrawBoard(board)
 	d.Update()
 
 	quit := false

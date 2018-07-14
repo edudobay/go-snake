@@ -12,3 +12,11 @@ const (
 	MapCellFree 
 	MapCellWall 
 )
+
+func (m GameMap) CellTypeAt(i, j int) MapCellType {
+	if i < 0 || i >= m.height || j < 0 || j >= m.width {
+		panic("out of map bounds")
+	}
+
+	return m.cells[i * m.width + j]
+}
