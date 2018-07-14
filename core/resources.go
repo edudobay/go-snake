@@ -13,12 +13,25 @@ type Resource interface {
 	Disposable
 }
 
-type Resources struct {
-    disposables []Disposable
+type resourcesStack struct {
+	top Disposable
+	rest *resourcesStack
 }
 
-func (rs *Resources) AddDisposable(r Disposable) {
-    rs.disposables = append(rs.disposables, r)
+func (stack *resourcesStack) Append(d Disposable) *resourcesStack {
+	return &resourcesStack{d, stack}
+}
+
+func (stack *resourcesStack) Pop() (Disposable, *resourcesStack) {
+	return stack.top, stack.rest
+}
+
+type Resources struct {
+	stack *resourcesStack
+}
+
+func (rs *Resources) AddDisposable(d Disposable) {
+	rs.stack = rs.stack.Append(d)
 }
 
 func (rs *Resources) Init(r Resource) error {
@@ -26,15 +39,17 @@ func (rs *Resources) Init(r Resource) error {
 	if err != nil {
 		return err
 	}
-    rs.disposables = append(rs.disposables, r)
+	rs.stack = rs.stack.Append(r)
 	return nil
 }
 
-func (rs Resources) Dispose() {
-    for i := len(rs.disposables) - 1; i >= 0; i-- {
-        rs.disposables[i].Dispose()
-    }
-    rs.disposables = []Disposable{}
+func (rs *Resources) Dispose() {
+	var d Disposable
+	for stack := rs.stack; stack != nil; {
+		d, stack = stack.Pop()
+		d.Dispose()
+	}
+	rs.stack = nil
 }
 
 type SimpleResource struct {
