@@ -1,11 +1,11 @@
 package core
 
 type Disposable interface {
-    Dispose()
+	Dispose()
 }
 
 type Allocatable interface {
-    Init() error
+	Init() error
 }
 
 type Resource interface {
@@ -14,7 +14,7 @@ type Resource interface {
 }
 
 type resourcesStack struct {
-	top Disposable
+	top  Disposable
 	rest *resourcesStack
 }
 
@@ -53,24 +53,23 @@ func (rs *Resources) Dispose() {
 }
 
 type SimpleResource struct {
-    OnInit func() error
-    OnDispose func()
+	OnInit    func() error
+	OnDispose func()
 }
 
 func DisposableResource(dispose func()) Resource {
-    return SimpleResource{
-        OnInit: func() error {
-            return nil
-        },
-        OnDispose: dispose,
-    }
+	return SimpleResource{
+		OnInit: func() error {
+			return nil
+		},
+		OnDispose: dispose,
+	}
 }
 
 func (d SimpleResource) Init() error {
-    return d.OnInit()
+	return d.OnInit()
 }
 
 func (d SimpleResource) Dispose() {
-    d.OnDispose()
+	d.OnDispose()
 }
-
