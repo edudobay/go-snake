@@ -28,12 +28,12 @@ func (d *Display) Update() {
 	d.renderer.Present()
 }
 
-func (d *Display) DrawSprite(id Sprite, x, y int32) {
+func (d *Display) DrawSprite(id Sprite, x, y int) {
 	d.sprites.DrawSprite(id, x, y)
 }
 
-func (d *Display) DrawWindow(x, y, w, h int32) {
-	rect := &sdl.Rect{X: x, Y: y, W: w, H: h}
+func (d *Display) DrawWindow(x, y, w, h int) {
+	rect := &sdl.Rect{X: int32(x), Y: int32(y), W: int32(w), H: int32(h)}
 	d.renderer.SetDrawColorArray(fgColor...)
 	d.renderer.FillRect(rect)
 

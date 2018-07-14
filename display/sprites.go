@@ -52,11 +52,11 @@ func LoadSprites(renderer *sdl.Renderer, resources core.HoldsDisposables) (*Spri
 }
 
 func (s *Sprites) sourceRectForSprite(id Sprite) *sdl.Rect {
-	xOffset := (int32)((id - (SpriteNone + 1)) * SpriteWidth)
+	xOffset := int32((id - (SpriteNone + 1)) * SpriteWidth)
 	return &sdl.Rect{X: xOffset, Y: 0, W: SpriteWidth, H: SpriteHeight}
 }
 
-func (s *Sprites) DrawSprite(id Sprite, x, y int32) {
+func (s *Sprites) DrawSprite(id Sprite, x, y int) {
 	if id < SpriteNone || id >= SpriteCount {
 		panic("invalid sprite ID")
 	}
@@ -66,7 +66,7 @@ func (s *Sprites) DrawSprite(id Sprite, x, y int32) {
 	}
 
 	src := s.sourceRectForSprite(id)
-	dest := &sdl.Rect{X: x, Y: y, W: SpriteWidth, H: SpriteHeight}
+	dest := &sdl.Rect{X: int32(x), Y: int32(y), W: int32(SpriteWidth), H: int32(SpriteHeight)}
 
 	s.renderer.Copy(s.texture, src, dest)
 }
