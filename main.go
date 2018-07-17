@@ -11,6 +11,7 @@ import (
 )
 
 const DefaultLevel = 7
+const DefaultMap = "data/square.map"
 
 type commandLineArgs struct {
 	Level int    `arg:"-l,help:start at this level number"`
@@ -20,6 +21,7 @@ type commandLineArgs struct {
 func getArgs() commandLineArgs {
 	var args commandLineArgs
 	args.Level = DefaultLevel
+	args.Map = DefaultMap
 
 	arg.MustParse(&args)
 
