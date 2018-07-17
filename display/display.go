@@ -15,6 +15,7 @@ const GridHeight = 30
 type Display struct {
 	renderer *sdl.Renderer
 	sprites  *Sprites
+	palette  *Palette
 }
 
 func (d *Display) Update() {
@@ -27,7 +28,7 @@ func (d *Display) DrawSprite(id Sprite, x, y int) {
 
 func (d *Display) DrawWindow(x, y, w, h int) {
 	rect := &sdl.Rect{X: int32(x), Y: int32(y), W: int32(w), H: int32(h)}
-	d.renderer.SetDrawColorArray(fgColor...)
+	SetDrawColorRGB(d.renderer, d.palette.FgColor)
 	d.renderer.FillRect(rect)
 
 	d.DrawSprite(SpriteBorderUpperLeft, x, y)
@@ -82,5 +83,5 @@ func InitDisplay(resources core.HoldsDisposables) (*Display, error) {
 		panic(err)
 	}
 
-	return &Display{renderer, sprites}, nil
+	return &Display{renderer, sprites, &AllPalettes[0]}, nil
 }

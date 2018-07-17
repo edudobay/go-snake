@@ -28,7 +28,7 @@ func (d *Display) DrawBoard(board snake.Board) {
 		W: int32(board.Width() * SpriteWidth),
 		H: int32(board.Height() * SpriteHeight)}
 
-	d.renderer.SetDrawColorArray(bgColor...)
+	SetDrawColorRGB(d.renderer, d.palette.BgColor)
 	d.renderer.FillRect(rect)
 
 	for i := 0; i < board.Height(); i++ {
