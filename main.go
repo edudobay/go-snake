@@ -53,7 +53,12 @@ func gameLoop(args commandLineArgs) {
 			case *sdl.QuitEvent:
 				println("quit")
 				quit = true
-				break
+
+			case *sdl.KeyboardEvent:
+				event := event.(*sdl.KeyboardEvent)
+				if event.Type == sdl.KEYDOWN {
+					fmt.Printf("key %v\n", event.Keysym)
+				}
 			}
 		}
 	}
