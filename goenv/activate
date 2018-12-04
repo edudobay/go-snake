@@ -1,1 +1,11 @@
-export GOPATH="$(dirname "$(realpath "$0")")"
+# zsh/bash compatible
+# See https://stackoverflow.com/a/28336473/302264 for ZSH syntax explanation
+ThisFile=${BASH_SOURCE[0]}
+if [[ -z "$ThisFile" ]]; then
+  ThisFile=${(%):-%x}
+fi
+
+export GOPATH=$(dirname "$(realpath "$ThisFile")")
+echo "Setting GOPATH to $GOPATH"
+
+unset ThisFile

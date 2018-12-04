@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -o errexit
+set -x
+
+root=$(dirname "$0")
+source "$root"/goenv/activate
+
+go get github.com/edudobay/go-snake
+go build
