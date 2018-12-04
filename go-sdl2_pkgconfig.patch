@@ -1,0 +1,49 @@
+diff --git a/gfx/sdl_gfx_cgo.go b/gfx/sdl_gfx_cgo.go
+index 6b451d4..0b25525 100644
+--- a/gfx/sdl_gfx_cgo.go
++++ b/gfx/sdl_gfx_cgo.go
+@@ -3,6 +3,6 @@
+ package gfx
+ 
+ //#cgo windows LDFLAGS: -lSDL2 -lSDL2_gfx
+-//#cgo linux freebsd darwin pkg-config: sdl2
++//#cgo linux freebsd darwin pkg-config: sdl2 SDL2_gfx
+ //#cgo linux freebsd darwin LDFLAGS: -lSDL2_gfx
+ import "C"
+diff --git a/img/sdl_image_cgo.go b/img/sdl_image_cgo.go
+index 025f8a7..6803e18 100644
+--- a/img/sdl_image_cgo.go
++++ b/img/sdl_image_cgo.go
+@@ -2,7 +2,7 @@
+ 
+ package img
+ 
+-//#cgo linux freebsd darwin pkg-config: sdl2
++//#cgo linux freebsd darwin pkg-config: sdl2 SDL2_image
+ //#cgo linux freebsd darwin LDFLAGS: -lSDL2_image
+ //#cgo windows LDFLAGS: -lSDL2 -lSDL2_image
+ import "C"
+diff --git a/mix/sdl_mixer_cgo.go b/mix/sdl_mixer_cgo.go
+index a025542..33db7c3 100644
+--- a/mix/sdl_mixer_cgo.go
++++ b/mix/sdl_mixer_cgo.go
+@@ -3,6 +3,6 @@
+ package mix
+ 
+ //#cgo windows LDFLAGS: -lSDL2 -lSDL2_mixer
+-//#cgo linux freebsd darwin pkg-config: sdl2
++//#cgo linux freebsd darwin pkg-config: sdl2 SDL2_mixer
+ //#cgo linux freebsd darwin LDFLAGS: -lSDL2_mixer
+ import "C"
+diff --git a/ttf/sdl_ttf_cgo.go b/ttf/sdl_ttf_cgo.go
+index 1e20291..f4c11c8 100644
+--- a/ttf/sdl_ttf_cgo.go
++++ b/ttf/sdl_ttf_cgo.go
+@@ -3,6 +3,6 @@
+ package ttf
+ 
+ //#cgo windows LDFLAGS: -lSDL2 -lSDL2_ttf
+-//#cgo linux freebsd darwin pkg-config: sdl2
++//#cgo linux freebsd darwin pkg-config: sdl2 SDL2_ttf
+ //#cgo linux freebsd darwin LDFLAGS: -lSDL2_ttf
+ import "C"
