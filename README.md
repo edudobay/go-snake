@@ -39,6 +39,12 @@ $ go install -v github.com/veandco/go-sdl2/{sdl,mix,img,ttf,gfx}
 
 ## Development environment
 
+### Git hooks
+
+Run `make init` so that Git uses the hooks from the provided `.githooks` dir.
+
+Currently those hooks ensure that `gofmt` style has been followed prior to committing Go source files.
+
 ### Vim
 
 Source the `env.vim` file to setup `make` with automatic `gofmt`.
