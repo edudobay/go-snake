@@ -13,14 +13,14 @@ const (
 	BoardCellWall
 )
 
-func CreateBoard(map_ GameMap) Board {
+func CreateBoard(map_ GameMap) *Board {
 	size := map_.Size()
 	cells := make([]BoardCellType, size)
 	for i, mapCell := range map_.Cells() {
 		cells[i] = cellTypeFromMapCell(mapCell)
 	}
 
-	return Board{map_.width, map_.height, cells}
+	return &Board{map_.width, map_.height, cells}
 }
 
 func (b Board) Width() int {

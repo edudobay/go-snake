@@ -21,7 +21,7 @@ func spriteForBoardCell(cellType snake.BoardCellType) Sprite {
 	}
 }
 
-func (d *Display) DrawBoard(board snake.Board) {
+func (d *Display) DrawBoard(board *snake.Board) {
 	rect := &sdl.Rect{
 		X: BoardX,
 		Y: BoardY,

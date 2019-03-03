@@ -9,10 +9,11 @@ type Game struct {
 	hasFood   bool
 	points    int
 	moveCount int
+	board     *Board
 }
 
-func NewGame(level int) Game {
-	return Game{
+func NewGame(level int, board *Board) *Game {
+	return &Game{
 		level:     level,
 		direction: Down,
 		size:      3,
@@ -20,5 +21,6 @@ func NewGame(level int) Game {
 		foodCount: 0,
 		hasFood:   false,
 		points:    0,
-		moveCount: 0}
+		moveCount: 0,
+		board:     board}
 }

@@ -14,7 +14,7 @@ const (
 	Left        Direction = 4
 )
 
-func (game Game) Move(direction Direction) {
+func (game *Game) Move(direction Direction) {
 	if direction == NoDirection {
 		panic("invalid argument for Game.Move: NoDirection")
 	}

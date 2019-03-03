@@ -22,10 +22,10 @@ type commandLineArgs struct {
 }
 
 type application struct {
-	Game       snake.Game
+	Game       *snake.Game
 	Display    *display.Display
 	Map        snake.GameMap
-	Board      snake.Board
+	Board      *snake.Board
 	Quit       chan quitSignal
 	Events     chan sdl.Event
 	KeyPresses chan sdl.Keysym
