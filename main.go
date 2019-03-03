@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"runtime"
 	"github.com/alexflint/go-arg"
 	"github.com/edudobay/go-snake/core"
 	"github.com/edudobay/go-snake/display"
@@ -30,7 +31,39 @@ func getArgs() commandLineArgs {
 
 func readKeys(game snake.Game) {
 	for key := range game.KeyPresses() {
-		fmt.Println("GAME: pressed key %v", key)
+		fmt.Printf("\x1b[1;32mGAME: pressed key %v\x1b[0;39m\n", key)
+	}
+}
+
+func handleGameEvent(game snake.Game, event sdl.Event, quit chan<- bool) {
+	switch event.(type) {
+	case *sdl.QuitEvent:
+		println("quit")
+		quit <- true
+
+	case *sdl.KeyboardEvent:
+		event := event.(*sdl.KeyboardEvent)
+		if event.Type == sdl.KEYDOWN {
+			game.OnKeyPressed(event.Keysym)
+		}
+	}
+}
+
+func processSdlEvents(events chan<- sdl.Event, quit <-chan bool) {
+	alive := true
+
+	go func() {
+		<-quit
+		alive = false
+	}()
+
+	for alive {
+		if event := sdl.PollEvent(); event != nil {
+			events <- event
+		}
+
+		// Yield execution to other goroutines
+		runtime.Gosched()
 	}
 }
 
@@ -52,25 +85,19 @@ func gameLoop(args commandLineArgs) {
 	d.DrawBoard(board)
 	d.Update()
 
+	quit := make(chan bool, 100)
+
 	go readKeys(game)
 
-	quit := false
-	for !quit {
-		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
-			switch event.(type) {
-			case *sdl.QuitEvent:
-				println("quit")
-				quit = true
+	events := make(chan sdl.Event, 100)
 
-			case *sdl.KeyboardEvent:
-				event := event.(*sdl.KeyboardEvent)
-				if event.Type == sdl.KEYDOWN {
-					game.OnKeyPressed(event.Keysym)
-				}
-			}
+	go func() {
+		for event := range events {
+			handleGameEvent(game, event, quit)
 		}
-	}
+	}()
 
+	processSdlEvents(events, quit)
 }
 
 func main() {
