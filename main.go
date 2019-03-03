@@ -23,6 +23,15 @@ type commandLineArgs struct {
 	Map   string `arg:"-m,help:set a custom map"`
 }
 
+type application struct {
+	Game 		snake.Game
+	Display  	*display.Display
+	Map			snake.GameMap
+	Board		snake.Board
+	Quit		chan quitSignal
+	Events		chan sdl.Event
+}
+
 func getArgs() commandLineArgs {
 	var args commandLineArgs
 	args.Level = DefaultLevel
@@ -75,33 +84,35 @@ func gameLoop(args commandLineArgs) {
 	resources := new(core.Resources)
 	defer resources.Dispose()
 
-	game := snake.NewGame(args.Level)
-	fmt.Printf("Game: %v\n", game)
+	app := new(application)
 
-	d, err := display.InitDisplay(resources)
+	app.Game = snake.NewGame(args.Level)
+	fmt.Printf("Game: %v\n", app.Game)
+
+	var err error
+	app.Display, err = display.InitDisplay(resources)
 	if err != nil {
 		return
 	}
 
-	map_ := snake.ReadMap(args.Map)
-	board := snake.CreateBoard(map_)
+	app.Map = snake.ReadMap(args.Map)
+	app.Board = snake.CreateBoard(app.Map)
 
-	d.DrawBoard(board)
-	d.Update()
+	app.Display.DrawBoard(app.Board)
+	app.Display.Update()
 
-	quit := make(chan quitSignal)
+	app.Quit = make(chan quitSignal)
+	app.Events = make(chan sdl.Event, 100)
 
-	go readKeys(game)
-
-	events := make(chan sdl.Event, 100)
+	go readKeys(app.Game)
 
 	go func() {
-		for event := range events {
-			handleGameEvent(game, event, quit)
+		for event := range app.Events {
+			handleGameEvent(app.Game, event, app.Quit)
 		}
 	}()
 
-	processSdlEvents(events, quit)
+	processSdlEvents(app.Events, app.Quit)
 }
 
 func main() {
