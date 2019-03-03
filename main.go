@@ -28,6 +28,12 @@ func getArgs() commandLineArgs {
 	return args
 }
 
+func readKeys(game snake.Game) {
+	for key := range game.KeyPresses() {
+		fmt.Println("GAME: pressed key %v", key)
+	}
+}
+
 func gameLoop(args commandLineArgs) {
 	resources := new(core.Resources)
 	defer resources.Dispose()
@@ -46,6 +52,8 @@ func gameLoop(args commandLineArgs) {
 	d.DrawBoard(board)
 	d.Update()
 
+	go readKeys(game)
+
 	quit := false
 	for !quit {
 		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
@@ -57,7 +65,7 @@ func gameLoop(args commandLineArgs) {
 			case *sdl.KeyboardEvent:
 				event := event.(*sdl.KeyboardEvent)
 				if event.Type == sdl.KEYDOWN {
-					fmt.Printf("key %v\n", event.Keysym)
+					game.OnKeyPressed(event.Keysym)
 				}
 			}
 		}
