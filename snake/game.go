@@ -1,11 +1,5 @@
 package snake
 
-import (
-	"github.com/veandco/go-sdl2/sdl"
-)
-
-const BUF_SIZE = 100
-
 type Game struct {
 	level     int
 	direction Direction
@@ -15,8 +9,6 @@ type Game struct {
 	hasFood   bool
 	points    int
 	moveCount int
-
-	keyPress  chan sdl.Keysym
 }
 
 func NewGame(level int) Game {
@@ -28,14 +20,5 @@ func NewGame(level int) Game {
 		foodCount: 0,
 		hasFood:   false,
 		points:    0,
-		moveCount: 0,
-		keyPress:  make(chan sdl.Keysym, BUF_SIZE) }
-}
-
-func (g Game) OnKeyPressed(key sdl.Keysym) {
-	g.keyPress <- key
-}
-
-func (g Game) KeyPresses() chan sdl.Keysym {
-	return g.keyPress
+		moveCount: 0}
 }

@@ -28,6 +28,7 @@ type application struct {
 	Board		snake.Board
 	Quit		chan quitSignal
 	Events		chan sdl.Event
+	KeyPresses	chan sdl.Keysym
 }
 
 func getArgs() commandLineArgs {
@@ -41,7 +42,7 @@ func getArgs() commandLineArgs {
 }
 
 func (app application) readKeys() {
-	for key := range app.Game.KeyPresses() {
+	for key := range app.KeyPresses {
 		switch key.Sym {
 		case sdl.K_q:
 			fmt.Println("quit")
@@ -52,17 +53,23 @@ func (app application) readKeys() {
 	}
 }
 
-func handleGameEvent(game snake.Game, event sdl.Event, quit chan<- quitSignal) {
+func (app application) handleEvent(event sdl.Event) {
 	switch event.(type) {
 	case *sdl.QuitEvent:
 		println("quit")
-		quit <- quitSignal{}
+		app.Quit <- quitSignal{}
 
 	case *sdl.KeyboardEvent:
 		event := event.(*sdl.KeyboardEvent)
 		if event.Type == sdl.KEYDOWN {
-			game.OnKeyPressed(event.Keysym)
+			app.KeyPresses <- event.Keysym
 		}
+	}
+}
+
+func (app application) handleEvents() {
+	for event := range app.Events {
+		app.handleEvent(event)
 	}
 }
 
@@ -81,12 +88,6 @@ func processSdlEvents(events chan<- sdl.Event, quit <-chan quitSignal) {
 
 		// Yield execution to other goroutines
 		runtime.Gosched()
-	}
-}
-
-func (app application) handleEvents() {
-	for event := range app.Events {
-		handleGameEvent(app.Game, event, app.Quit)
 	}
 }
 
@@ -113,6 +114,7 @@ func gameLoop(args commandLineArgs) {
 
 	app.Quit = make(chan quitSignal)
 	app.Events = make(chan sdl.Event, 100)
+	app.KeyPresses = make(chan sdl.Keysym, 100)
 
 	go app.readKeys()
 	go app.handleEvents()
