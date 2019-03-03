@@ -1,7 +1,5 @@
 package snake
 
-import "fmt"
-
 const BufSize = 16
 
 type signal struct{}
@@ -9,8 +7,7 @@ type signal struct{}
 type Board struct {
 	width, height int
 	cells         []BoardCellType
-	snakeHead     *snakeCell
-	snakeEnd      *snakeCell
+	snakeCells    snakeCells
 	updates       chan signal
 }
 
@@ -21,6 +18,8 @@ type snakeCell struct {
 	next *snakeCell
 	prev *snakeCell
 }
+
+type snakeCells []int
 
 const (
 	BoardCellInvalid BoardCellType = iota
@@ -36,7 +35,7 @@ func CreateBoard(map_ GameMap) *Board {
 		cells[i] = cellTypeFromMapCell(mapCell)
 	}
 
-	return &Board{map_.width, map_.height, cells, nil, nil, make(chan signal, BufSize)}
+	return &Board{map_.width, map_.height, cells, snakeCells{}, make(chan signal, BufSize)}
 }
 
 func (b Board) Width() int {
@@ -116,47 +115,16 @@ func (b *Board) PutSnake(i, j, size int, direction Direction) {
 	head := b.cellAddress(i, j)
 	pos := head
 
-	var prevCell *snakeCell = nil
+	cells := make(snakeCells, size)
 
-	for i := 0; i < size; i++ {
+	for i := size - 1; i >= 0; i-- {
 		b.cells[pos] = BoardCellSnakeBody
-
-		cell := &snakeCell{pos, nil, prevCell}
-		if prevCell != nil {
-			prevCell.next = cell
-		}
-		if b.snakeHead == nil {
-			fmt.Printf("new snake head at %v\n", cell)
-			b.snakeHead = cell
-		}
-
-		prevCell = cell
-		b.snakeEnd = cell
+		cells[i] = pos
 		pos += b.step(direction)
 	}
 
+	b.snakeCells = cells
 	b.updated()
-}
-
-func (c *snakeCell) append(pos int) *snakeCell {
-	cell := &snakeCell{pos, nil, c}
-	c.next = cell
-	return cell
-}
-
-func (c *snakeCell) prepend(pos int) *snakeCell {
-	cell := &snakeCell{pos, c, nil}
-	c.prev = cell
-	return cell
-}
-
-func (c *snakeCell) popNext() *snakeCell {
-	next := c.next
-	if next != nil {
-		c.next = nil
-		next.prev = nil
-	}
-	return next
 }
 
 func (b *Board) checkPos(pos int) {
@@ -165,28 +133,31 @@ func (b *Board) checkPos(pos int) {
 	}
 }
 
-func (b *Board) growSnakeHead(direction Direction) {
-	if b.snakeHead == nil {
-		panic("no snake head")
-	}
-	oldHead := b.snakeHead
-	newPos := oldHead.pos + b.step(direction)
-	b.checkPos(newPos)
+func (b *Board) headPos() int {
+	return b.snakeCells[len(b.snakeCells)-1]
+}
 
-	newHead := b.snakeHead.prepend(newPos)
-	b.snakeHead = newHead
-	b.cells[newHead.pos] = BoardCellSnakeBody
+func (b *Board) posFromHead(count int) int {
+	return b.snakeCells[(len(b.snakeCells)-1)-count]
+}
+
+func (b *Board) growSnakeHead(direction Direction) {
+	oldHead := b.headPos()
+	newHead := oldHead + b.step(direction)
+	b.checkPos(newHead)
+
+	b.snakeCells = append(b.snakeCells, newHead)
+	b.cells[newHead] = BoardCellSnakeBody
 }
 
 func (b *Board) shrinkSnakeTail() {
-	if b.snakeEnd.prev == nil {
-		panic("tried to remove only cell (prev == nil)")
+	if len(b.snakeCells) <= 1 {
+		panic("tried to remove only cell")
 	}
-	oldEnd := b.snakeEnd
-	newEnd := b.snakeEnd.prev
-	newEnd.popNext()
-	b.snakeEnd = newEnd
-	b.cells[oldEnd.pos] = BoardCellFree
+	oldEnd := b.snakeCells[0]
+	b.cells[oldEnd] = BoardCellFree
+
+	b.snakeCells = b.snakeCells[1:]
 }
 
 func (b *Board) GrowSnake(direction Direction) {
@@ -195,11 +166,11 @@ func (b *Board) GrowSnake(direction Direction) {
 }
 
 func (b *Board) MoveSnake(direction Direction) MoveResult {
-	newPos := b.snakeHead.pos + b.step(direction)
+	newPos := b.headPos() + b.step(direction)
 
 	switch b.cells[newPos] {
 	case BoardCellSnakeBody:
-		if newPos == b.snakeHead.next.pos {
+		if newPos == b.posFromHead(1) {
 			return MoveSelf
 		} else {
 			return MoveSelfCollide
