@@ -7,6 +7,8 @@
 * Prepare the SDL packages as described in the section below.
 * Run the `./build` script.
 
+After configuration, you can use `make` to build.
+
 ### Preparing the SDL packages
 
 * Ensure you have pkgconfig and all SDL components installed

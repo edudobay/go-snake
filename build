@@ -17,4 +17,4 @@ mkdir -p goenv/src/$project_parent
     ln -s $(realpath --relative-to=goenv/src/$project_parent .) goenv/src/$project
 
 go get github.com/edudobay/go-snake
-go build
+go build -o go-snake
