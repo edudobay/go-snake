@@ -1,4 +1,4 @@
-package sdl
+package sdlutil
 
 import (
 	"fmt"

@@ -5,7 +5,7 @@ import (
 	"github.com/alexflint/go-arg"
 	"github.com/edudobay/go-snake/core"
 	"github.com/edudobay/go-snake/display"
-	sdlCore "github.com/edudobay/go-snake/sdl"
+	"github.com/edudobay/go-snake/sdlutil"
 	"github.com/edudobay/go-snake/snake"
 	"github.com/veandco/go-sdl2/sdl"
 	"runtime"
@@ -134,8 +134,8 @@ func main() {
 	}
 
 	resources := new(core.Resources)
-	resources.Init(sdlCore.SdlResource())
-	resources.Init(sdlCore.ImgResource())
+	resources.Init(sdlutil.SdlResource())
+	resources.Init(sdlutil.ImgResource())
 
 	defer resources.Dispose()
 
