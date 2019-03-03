@@ -45,8 +45,7 @@ func (app application) readKeys() {
 	for key := range app.KeyPresses {
 		switch key.Sym {
 		case sdl.K_q:
-			fmt.Println("quit")
-			app.Quit <- quitSignal{}
+			app.quit()
 
 		case sdl.K_LEFT:
 			app.Game.Move(snake.Left)
@@ -62,11 +61,16 @@ func (app application) readKeys() {
 	}
 }
 
+func (app application) quit() {
+	println("quit")
+	app.Quit <- quitSignal{}
+	close(app.Quit)
+}
+
 func (app application) handleEvent(event sdl.Event) {
 	switch event.(type) {
 	case *sdl.QuitEvent:
-		println("quit")
-		app.Quit <- quitSignal{}
+		app.quit()
 
 	case *sdl.KeyboardEvent:
 		event := event.(*sdl.KeyboardEvent)
