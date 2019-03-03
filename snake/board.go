@@ -194,8 +194,22 @@ func (b *Board) GrowSnake(direction Direction) {
 	b.updated()
 }
 
-func (b *Board) MoveSnake(direction Direction) {
+func (b *Board) MoveSnake(direction Direction) MoveResult {
+	newPos := b.snakeHead.pos + b.step(direction)
+
+	switch b.cells[newPos] {
+	case BoardCellSnakeBody:
+		if newPos == b.snakeHead.next.pos {
+			return MoveSelf
+		} else {
+			return MoveSelfCollide
+		}
+	case BoardCellWall:
+		return MoveWall
+	}
+
 	b.growSnakeHead(direction)
 	b.shrinkSnakeTail()
 	b.updated()
+	return MoveOk
 }
