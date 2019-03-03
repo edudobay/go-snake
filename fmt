@@ -1,0 +1,30 @@
+#!/bin/bash
+
+set -o errexit
+
+type gofmt &>/dev/null || { echo "gofmt not found"; exit 1; }
+
+_fmt_fix() {
+  find . \! -path './goenv/*' -name '*.go' -print0 | \
+    xargs -0 gofmt -l -w
+}
+
+_fmt_check() {
+  local IFS=$'\n'
+  changed_files=($( \
+    find . \! -path './goenv/*' -name '*.go' -print0 | \
+      xargs -0 gofmt -l))
+
+  changed_files_count=${#changed_files[@]}
+
+  [[ $changed_files_count -eq 0 ]] || {
+    echo "${changed_files[*]}"
+    return 1
+  }
+}
+
+case "$1" in
+  check) _fmt_check ;;
+  fix) _fmt_fix ;;
+  *) echo "invalid command"; exit 1 ;;
+esac

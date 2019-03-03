@@ -1,11 +1,13 @@
 all: go-snake
 
-.PHONY: go-snake fmt
+.PHONY: go-snake init fmt
 
 go-snake:
 	source goenv/activate && \
 	    go build -o go-snake
 
+init:
+	git config core.hooksPath .githooks
+
 fmt:
-	find . \! -path './goenv/*' -name '*.go' -print0 | \
-	    xargs -0 gofmt -l -w
+	./fmt fix
