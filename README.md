@@ -36,3 +36,13 @@ $ go get -d github.com/veandco/go-sdl2/{sdl,mix,img,ttf,gfx}
 $ patch -p1 -d goenv/src/github.com/veandco/go-sdl2/ < go-sdl2_pkgconfig.patch
 $ go install -v github.com/veandco/go-sdl2/{sdl,mix,img,ttf,gfx}
 ```
+
+## Development environment
+
+### Vim
+
+Source the `env.vim` file to setup `make` with automatic `gofmt`.
+
+```vim
+:source env.vim
+```
