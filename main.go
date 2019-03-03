@@ -40,9 +40,15 @@ func getArgs() commandLineArgs {
 	return args
 }
 
-func readKeys(game snake.Game) {
-	for key := range game.KeyPresses() {
-		fmt.Printf("\x1b[1;32mGAME: pressed key %v\x1b[0;39m\n", key)
+func (app application) readKeys() {
+	for key := range app.Game.KeyPresses() {
+		switch key.Sym {
+		case sdl.K_q:
+			fmt.Println("quit")
+			app.Quit <- quitSignal{}
+		default:
+			fmt.Printf("\x1b[1;32mGAME: pressed key %v\x1b[0;39m\n", key)
+		}
 	}
 }
 
@@ -108,7 +114,7 @@ func gameLoop(args commandLineArgs) {
 	app.Quit = make(chan quitSignal)
 	app.Events = make(chan sdl.Event, 100)
 
-	go readKeys(app.Game)
+	go app.readKeys()
 	go app.handleEvents()
 
 	processSdlEvents(app.Events, app.Quit)
