@@ -110,7 +110,13 @@ func gameLoop(args commandLineArgs) {
 
 	app := new(application)
 
-	app.Game = snake.NewGame(args.Level)
+	app.Map = snake.ReadMap(args.Map)
+	app.Board = snake.CreateBoard(app.Map)
+
+	snakeX, snakeY := app.Board.Center()
+	app.Board.PutSnake(snakeX, snakeY, 4, snake.Down)
+
+	app.Game = snake.NewGame(args.Level, app.Board)
 	fmt.Printf("Game: %v\n", app.Game)
 
 	var err error
@@ -118,9 +124,6 @@ func gameLoop(args commandLineArgs) {
 	if err != nil {
 		return
 	}
-
-	app.Map = snake.ReadMap(args.Map)
-	app.Board = snake.CreateBoard(app.Map)
 
 	app.Display.DrawBoard(app.Board)
 	app.Display.Update()
@@ -131,6 +134,17 @@ func gameLoop(args commandLineArgs) {
 
 	go app.readKeys()
 	go app.handleEvents()
+	go func() {
+		for {
+			select {
+			case <-app.Board.Updates():
+				app.Display.DrawBoard(app.Board)
+				app.Display.Update()
+			case <-app.Quit:
+				return
+			}
+		}
+	}()
 
 	processSdlEvents(app.Events, app.Quit)
 }

@@ -20,4 +20,6 @@ func (game *Game) Move(direction Direction) {
 	}
 	log.Printf("Moving to direction %v\n", direction)
 	game.direction = direction
+
+	game.board.MoveSnake(direction)
 }

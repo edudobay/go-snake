@@ -14,6 +14,8 @@ func spriteForBoardCell(cellType snake.BoardCellType) Sprite {
 		return SpriteNone
 	case snake.BoardCellWall:
 		return SpriteWall
+	case snake.BoardCellSnakeBody:
+		return SpriteBody
 	case snake.BoardCellInvalid:
 		return SpriteNone
 	default:
