@@ -106,7 +106,7 @@ func main() {
 
 	fmt.Printf("Starting at level %d\n", args.Level)
 	if args.Map != "" {
-		fmt.Printf("Map: %v", args.Map)
+		fmt.Printf("Map: %v\n", args.Map)
 	} else {
 		fmt.Println("Map is nil")
 	}
