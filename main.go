@@ -80,6 +80,12 @@ func processSdlEvents(events chan<- sdl.Event, quit quitReceiver) {
 	}
 }
 
+func (app application) handleEvents() {
+	for event := range app.Events {
+		handleGameEvent(app.Game, event, app.Quit)
+	}
+}
+
 func gameLoop(args commandLineArgs) {
 	resources := new(core.Resources)
 	defer resources.Dispose()
@@ -105,12 +111,7 @@ func gameLoop(args commandLineArgs) {
 	app.Events = make(chan sdl.Event, 100)
 
 	go readKeys(app.Game)
-
-	go func() {
-		for event := range app.Events {
-			handleGameEvent(app.Game, event, app.Quit)
-		}
-	}()
+	go app.handleEvents()
 
 	processSdlEvents(app.Events, app.Quit)
 }
