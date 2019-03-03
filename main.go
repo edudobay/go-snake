@@ -14,6 +14,10 @@ import (
 const DefaultLevel = 7
 const DefaultMap = "data/square.map"
 
+type quitSignal struct{}
+type quitReceiver <-chan quitSignal
+type quitSender chan<- quitSignal
+
 type commandLineArgs struct {
 	Level int    `arg:"-l,help:start at this level number"`
 	Map   string `arg:"-m,help:set a custom map"`
@@ -35,11 +39,11 @@ func readKeys(game snake.Game) {
 	}
 }
 
-func handleGameEvent(game snake.Game, event sdl.Event, quit chan<- bool) {
+func handleGameEvent(game snake.Game, event sdl.Event, quit quitSender) {
 	switch event.(type) {
 	case *sdl.QuitEvent:
 		println("quit")
-		quit <- true
+		quit <- quitSignal{}
 
 	case *sdl.KeyboardEvent:
 		event := event.(*sdl.KeyboardEvent)
@@ -49,7 +53,7 @@ func handleGameEvent(game snake.Game, event sdl.Event, quit chan<- bool) {
 	}
 }
 
-func processSdlEvents(events chan<- sdl.Event, quit <-chan bool) {
+func processSdlEvents(events chan<- sdl.Event, quit quitReceiver) {
 	alive := true
 
 	go func() {
@@ -85,7 +89,7 @@ func gameLoop(args commandLineArgs) {
 	d.DrawBoard(board)
 	d.Update()
 
-	quit := make(chan bool, 100)
+	quit := make(chan quitSignal)
 
 	go readKeys(game)
 
