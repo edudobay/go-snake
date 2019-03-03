@@ -1,5 +1,20 @@
 package core
 
+type resourcesStack struct {
+	top  Disposable
+	rest *resourcesStack
+}
+
+func (stack *resourcesStack) Append(d Disposable) *resourcesStack {
+	return &resourcesStack{d, stack}
+}
+
+func (stack *resourcesStack) Pop() (Disposable, *resourcesStack) {
+	return stack.top, stack.rest
+}
+
+//
+
 type Resources struct {
 	stack *resourcesStack
 }
@@ -24,19 +39,4 @@ func (rs *Resources) Dispose() {
 		d.Dispose()
 	}
 	rs.stack = nil
-}
-
-//
-
-type resourcesStack struct {
-	top  Disposable
-	rest *resourcesStack
-}
-
-func (stack *resourcesStack) Append(d Disposable) *resourcesStack {
-	return &resourcesStack{d, stack}
-}
-
-func (stack *resourcesStack) Pop() (Disposable, *resourcesStack) {
-	return stack.top, stack.rest
 }
