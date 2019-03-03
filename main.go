@@ -15,8 +15,6 @@ const DefaultLevel = 7
 const DefaultMap = "data/square.map"
 
 type quitSignal struct{}
-type quitReceiver <-chan quitSignal
-type quitSender chan<- quitSignal
 
 type commandLineArgs struct {
 	Level int    `arg:"-l,help:start at this level number"`
@@ -48,7 +46,7 @@ func readKeys(game snake.Game) {
 	}
 }
 
-func handleGameEvent(game snake.Game, event sdl.Event, quit quitSender) {
+func handleGameEvent(game snake.Game, event sdl.Event, quit chan<- quitSignal) {
 	switch event.(type) {
 	case *sdl.QuitEvent:
 		println("quit")
@@ -62,7 +60,7 @@ func handleGameEvent(game snake.Game, event sdl.Event, quit quitSender) {
 	}
 }
 
-func processSdlEvents(events chan<- sdl.Event, quit quitReceiver) {
+func processSdlEvents(events chan<- sdl.Event, quit <-chan quitSignal) {
 	alive := true
 
 	go func() {
