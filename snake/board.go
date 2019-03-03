@@ -7,7 +7,7 @@ type Board struct {
 type BoardCellType int
 
 const (
-	BoardCellInvalid  BoardCellType = iota
+	BoardCellInvalid BoardCellType = iota
 	BoardCellFree
 	BoardCellWall
 )
@@ -26,9 +26,13 @@ func (b Board) Height() int {
 
 func (b Board) CellTypeAt(i, j int) BoardCellType {
 	switch b.map_.CellTypeAt(i, j) {
-	case MapCellInvalid: return BoardCellInvalid
-	case MapCellFree: return BoardCellFree
-	case MapCellWall: return BoardCellWall
-	default: panic("invalid map cell type found")
+	case MapCellInvalid:
+		return BoardCellInvalid
+	case MapCellFree:
+		return BoardCellFree
+	case MapCellWall:
+		return BoardCellWall
+	default:
+		panic("invalid map cell type found")
 	}
 }

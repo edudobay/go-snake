@@ -14,6 +14,7 @@ type Palette struct {
 }
 
 const NumPalettes = 5
+
 var CurrentPalette = 0
 var PsychedelicMode = 0
 

@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
-	"runtime"
 	"github.com/alexflint/go-arg"
 	"github.com/edudobay/go-snake/core"
 	"github.com/edudobay/go-snake/display"
 	sdlCore "github.com/edudobay/go-snake/sdl"
 	"github.com/edudobay/go-snake/snake"
 	"github.com/veandco/go-sdl2/sdl"
+	"runtime"
 )
 
 const DefaultLevel = 7
@@ -22,13 +22,13 @@ type commandLineArgs struct {
 }
 
 type application struct {
-	Game 		snake.Game
-	Display  	*display.Display
-	Map			snake.GameMap
-	Board		snake.Board
-	Quit		chan quitSignal
-	Events		chan sdl.Event
-	KeyPresses	chan sdl.Keysym
+	Game       snake.Game
+	Display    *display.Display
+	Map        snake.GameMap
+	Board      snake.Board
+	Quit       chan quitSignal
+	Events     chan sdl.Event
+	KeyPresses chan sdl.Keysym
 }
 
 func getArgs() commandLineArgs {

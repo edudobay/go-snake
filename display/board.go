@@ -34,8 +34,8 @@ func (d *Display) DrawBoard(board snake.Board) {
 	for i := 0; i < board.Height(); i++ {
 		for j := 0; j < board.Width(); j++ {
 			sprite := spriteForBoardCell(board.CellTypeAt(i, j))
-			x := BoardX + j * SpriteWidth
-			y := BoardY + i * SpriteHeight
+			x := BoardX + j*SpriteWidth
+			y := BoardY + i*SpriteHeight
 			d.DrawSprite(sprite, x, y)
 		}
 	}
