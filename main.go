@@ -47,6 +47,15 @@ func (app application) readKeys() {
 		case sdl.K_q:
 			fmt.Println("quit")
 			app.Quit <- quitSignal{}
+
+		case sdl.K_LEFT:
+			app.Game.Move(snake.Left)
+		case sdl.K_RIGHT:
+			app.Game.Move(snake.Right)
+		case sdl.K_UP:
+			app.Game.Move(snake.Up)
+		case sdl.K_DOWN:
+			app.Game.Move(snake.Down)
 		default:
 			fmt.Printf("\x1b[1;32mGAME: pressed key %v\x1b[0;39m\n", key)
 		}
