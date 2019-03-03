@@ -1,7 +1,8 @@
 package snake
 
 type Board struct {
-	map_ GameMap
+	width, height int
+	cells         []BoardCellType
 }
 
 type BoardCellType int
@@ -13,19 +14,33 @@ const (
 )
 
 func CreateBoard(map_ GameMap) Board {
-	return Board{map_}
+	size := map_.Size()
+	cells := make([]BoardCellType, size)
+	for i, mapCell := range map_.Cells() {
+		cells[i] = cellTypeFromMapCell(mapCell)
+	}
+
+	return Board{map_.width, map_.height, cells}
 }
 
 func (b Board) Width() int {
-	return b.map_.width
+	return b.width
 }
 
 func (b Board) Height() int {
-	return b.map_.height
+	return b.height
 }
 
 func (b Board) CellTypeAt(i, j int) BoardCellType {
-	switch b.map_.CellTypeAt(i, j) {
+	if i < 0 || i >= b.height || j < 0 || j >= b.width {
+		panic("out of board bounds")
+	}
+
+	return b.cells[i*b.width+j]
+}
+
+func cellTypeFromMapCell(mapCellType MapCellType) BoardCellType {
+	switch mapCellType {
 	case MapCellInvalid:
 		return BoardCellInvalid
 	case MapCellFree:
