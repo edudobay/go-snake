@@ -25,6 +25,11 @@ type controller interface {
 	HandleEvent(sdl.Event)
 }
 
+type eventToDispatch struct {
+	event      sdl.Event
+	controller controller
+}
+
 type application struct {
 	Game             *snake.Game
 	Display          *display.Display
@@ -32,6 +37,7 @@ type application struct {
 	Board            *snake.Board
 	Quit             chan quitSignal
 	Events           chan sdl.Event
+	DispatchQueue    chan eventToDispatch
 	ActiveController controller
 }
 
@@ -56,7 +62,20 @@ func (app application) handleEvent(event sdl.Event) {
 	if controller == nil {
 		panic("no active controller to dispatch to")
 	}
-	controller.HandleEvent(event)
+	app.DispatchQueue <- eventToDispatch{event, controller}
+}
+
+func (app application) dispatchEvents() {
+	for {
+		select {
+		case e := <-app.DispatchQueue:
+			e.controller.HandleEvent(e.event)
+
+		case <-app.Quit:
+			fmt.Println("QUIT: detected from dispatch queue")
+			return
+		}
+	}
 }
 
 func (app application) handleEvents() {
@@ -89,6 +108,8 @@ func gameLoop(args commandLineArgs) {
 
 	app := new(application)
 
+	app.DispatchQueue = make(chan eventToDispatch, 64)
+
 	app.Map = snake.ReadMap(args.Map)
 	app.Board = snake.CreateBoard(app.Map)
 
@@ -112,6 +133,7 @@ func gameLoop(args commandLineArgs) {
 
 	app.ActiveController = &mainController{app: app}
 
+	go app.dispatchEvents()
 	go app.handleEvents()
 	go func() {
 		for {
