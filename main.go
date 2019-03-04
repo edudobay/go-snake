@@ -21,14 +21,18 @@ type commandLineArgs struct {
 	Map   string `arg:"-m,help:set a custom map"`
 }
 
+type controller interface {
+	HandleEvent(sdl.Event)
+}
+
 type application struct {
-	Game       *snake.Game
-	Display    *display.Display
-	Map        snake.GameMap
-	Board      *snake.Board
-	Quit       chan quitSignal
-	Events     chan sdl.Event
-	KeyPresses chan sdl.Keysym
+	Game             *snake.Game
+	Display          *display.Display
+	Map              snake.GameMap
+	Board            *snake.Board
+	Quit             chan quitSignal
+	Events           chan sdl.Event
+	ActiveController controller
 }
 
 func getArgs() commandLineArgs {
@@ -41,26 +45,6 @@ func getArgs() commandLineArgs {
 	return args
 }
 
-func (app application) readKeys() {
-	for key := range app.KeyPresses {
-		switch key.Sym {
-		case sdl.K_q:
-			app.quit()
-
-		case sdl.K_LEFT:
-			app.Game.Move(snake.Left)
-		case sdl.K_RIGHT:
-			app.Game.Move(snake.Right)
-		case sdl.K_UP:
-			app.Game.Move(snake.Up)
-		case sdl.K_DOWN:
-			app.Game.Move(snake.Down)
-		default:
-			fmt.Printf("\x1b[1;32mGAME: pressed key %v\x1b[0;39m\n", key)
-		}
-	}
-}
-
 func (app application) quit() {
 	println("quit")
 	app.Quit <- quitSignal{}
@@ -68,16 +52,11 @@ func (app application) quit() {
 }
 
 func (app application) handleEvent(event sdl.Event) {
-	switch event.(type) {
-	case *sdl.QuitEvent:
-		app.quit()
-
-	case *sdl.KeyboardEvent:
-		event := event.(*sdl.KeyboardEvent)
-		if event.Type == sdl.KEYDOWN {
-			app.KeyPresses <- event.Keysym
-		}
+	controller := app.ActiveController
+	if controller == nil {
+		panic("no active controller to dispatch to")
 	}
+	controller.HandleEvent(event)
 }
 
 func (app application) handleEvents() {
@@ -130,9 +109,9 @@ func gameLoop(args commandLineArgs) {
 
 	app.Quit = make(chan quitSignal)
 	app.Events = make(chan sdl.Event, 100)
-	app.KeyPresses = make(chan sdl.Keysym, 100)
 
-	go app.readKeys()
+	app.ActiveController = &mainController{app: app}
+
 	go app.handleEvents()
 	go func() {
 		for {
