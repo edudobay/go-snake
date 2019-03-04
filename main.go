@@ -9,6 +9,7 @@ import (
 	"github.com/edudobay/go-snake/snake"
 	"github.com/veandco/go-sdl2/sdl"
 	"runtime"
+	"time"
 )
 
 const DefaultLevel = 7
@@ -23,6 +24,7 @@ type commandLineArgs struct {
 
 type controller interface {
 	HandleEvent(sdl.Event)
+	OnTick(uint32)
 }
 
 type eventToDispatch struct {
@@ -39,6 +41,7 @@ type application struct {
 	Events           chan sdl.Event
 	DispatchQueue    chan eventToDispatch
 	ActiveController controller
+	LastTick         uint32
 }
 
 func getArgs() commandLineArgs {
@@ -57,11 +60,16 @@ func (app application) quit() {
 	close(app.Quit)
 }
 
-func (app application) handleEvent(event sdl.Event) {
+func (app application) GetController() controller {
 	controller := app.ActiveController
 	if controller == nil {
 		panic("no active controller to dispatch to")
 	}
+	return controller
+}
+
+func (app application) handleEvent(event sdl.Event) {
+	controller := app.GetController()
 	app.DispatchQueue <- eventToDispatch{event, controller}
 }
 
@@ -74,6 +82,9 @@ func (app application) dispatchEvents() {
 		case <-app.Quit:
 			fmt.Println("QUIT: detected from dispatch queue")
 			return
+
+		case <-time.After(20 * time.Millisecond):
+			app.GetController().OnTick(sdl.GetTicks())
 		}
 	}
 }
@@ -114,7 +125,7 @@ func gameLoop(args commandLineArgs) {
 	app.Board = snake.CreateBoard(app.Map)
 
 	snakeX, snakeY := app.Board.Center()
-	app.Board.PutSnake(snakeX, snakeY, 4, snake.Down)
+	app.Board.PutSnake(snakeX, snakeY, 4, snake.Left)
 
 	app.Game = snake.NewGame(args.Level, app.Board)
 	fmt.Printf("Game: %v\n", app.Game)
@@ -133,7 +144,9 @@ func gameLoop(args commandLineArgs) {
 	app.Quit = make(chan quitSignal)
 	app.Events = make(chan sdl.Event, 100)
 
+	app.LastTick = sdl.GetTicks()
 	app.ActiveController = &mainController{app: app}
+	app.Game.Move(snake.Right)
 
 	go app.dispatchEvents()
 	go app.handleEvents()

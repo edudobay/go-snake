@@ -28,3 +28,11 @@ func (game *Game) Move(direction Direction) {
 
 	game.board.MoveSnake(direction)
 }
+
+func (game *Game) Tick() {
+	if game.direction == NoDirection {
+		panic("no direction during Game.Tick")
+	}
+
+	game.board.MoveSnake(game.direction)
+}

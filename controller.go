@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/edudobay/go-snake/snake"
 	"github.com/veandco/go-sdl2/sdl"
+	"time"
 )
 
 type mainController struct {
@@ -20,6 +21,14 @@ func (c *mainController) HandleEvent(event sdl.Event) {
 		if event.Type == sdl.KEYDOWN {
 			c.keyPressed(event.Keysym)
 		}
+	}
+}
+
+func (c *mainController) OnTick(tick uint32) {
+	elapsed := time.Duration(tick-c.app.LastTick) * time.Millisecond
+	if elapsed >= 200*time.Millisecond {
+		c.app.Game.Tick()
+		c.app.LastTick = tick
 	}
 }
 
