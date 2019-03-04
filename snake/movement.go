@@ -1,9 +1,5 @@
 package snake
 
-import (
-	"log"
-)
-
 type Direction int
 
 type MoveResult int
@@ -27,7 +23,7 @@ func (game *Game) Move(direction Direction) {
 	if direction == NoDirection {
 		panic("invalid argument for Game.Move: NoDirection")
 	}
-	log.Printf("Moving to direction %v\n", direction)
+
 	game.direction = direction
 
 	game.board.MoveSnake(direction)
