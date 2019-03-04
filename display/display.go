@@ -26,6 +26,13 @@ func (d *Display) DrawSprite(id Sprite, x, y int) {
 	d.sprites.DrawSprite(id, x, y)
 }
 
+func (d *Display) ClearWindow() {
+	rect := &sdl.Rect{X: 0, Y: 0, W: ScreenWidth, H: ScreenHeight}
+	SetDrawColorRGB(d.renderer, RGBColor{0, 0, 0})
+	d.renderer.Clear()
+	d.renderer.FillRect(rect)
+}
+
 func (d *Display) DrawWindow(x, y, w, h int) {
 	rect := &sdl.Rect{X: int32(x), Y: int32(y), W: int32(w), H: int32(h)}
 	SetDrawColorRGB(d.renderer, d.palette.FgColor)

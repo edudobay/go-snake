@@ -125,6 +125,8 @@ func gameLoop(args commandLineArgs) {
 		return
 	}
 
+	app.Display.ClearWindow()
+
 	app.Display.DrawBoard(app.Board)
 	app.Display.Update()
 
