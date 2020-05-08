@@ -1,41 +1,24 @@
-## Requirements
+# go-snake
 
-* Golang 1.10 (other versions were not tested)
+Toy project: Go (golang) rewrite of my old Snake implementation in C
+
+## Build requirements
+
+* Go 1.14
+* SDL (see [Installing the SDL packages](#installing-the-sdl-packages) below)
 
 ## Compiling
 
-* Prepare the SDL packages as described in the section below.
-* Run the `./build` script.
+* Run `make`.
 
-After configuration, you can use `make` to build.
+### Installing the SDL packages
 
-### Preparing the SDL packages
+Ensure you have pkgconfig and all SDL components installed. See full instructions in [go-sdl2][].
 
-* Ensure you have pkgconfig and all SDL components installed
-* Set the GOPATH (`source goenv/activate`)
-* Run `go get -d` to download the SDL packages *without compiling them*
-* Patch the sources with the appropriate pkgconfig information
-* Run `go install` for all SDL packages
-
-Using the [Nix](https://nixos.org/nix/manual/) package manager:
-
-```
-$ nix-shell -p pkgconfig SDL2 SDL2_{gfx,image,mixer,ttf}
-(nix)$ source goenv/activate
-(nix)$ go get -d github.com/veandco/go-sdl2/{sdl,mix,img,ttf,gfx}
-(nix)$ patch -p1 -d goenv/src/github.com/veandco/go-sdl2/ < go-sdl2_pkgconfig.patch
-(nix)$ go install -v github.com/veandco/go-sdl2/{sdl,mix,img,ttf,gfx}
-```
-
-On macOS, you can use the SDL packages from Homebrew:
-
-```
-$ brew install sdl2 sdl2_{gfx,image,mixer,ttf}
-$ source goenv/activate
-$ go get -d github.com/veandco/go-sdl2/{sdl,mix,img,ttf,gfx}
-$ patch -p1 -d goenv/src/github.com/veandco/go-sdl2/ < go-sdl2_pkgconfig.patch
-$ go install -v github.com/veandco/go-sdl2/{sdl,mix,img,ttf,gfx}
-```
+* Arch: `pacman -S sdl2{,_image,_mixer,_ttf,_gfx}`
+* Debian/Ubuntu: `apt install libsdl2{,-image,-mixer,-ttf,-gfx}-dev`
+* macOS with Homebrew: `brew install sdl2{,_gfx,_image,_mixer,_ttf} pkg-config`
+* [Nix](https://nixos.org/nix/manual/) package manager: `nix-shell -p pkgconfig SDL2 SDL2_{gfx,image,mixer,ttf}`
 
 ## Development environment
 
@@ -52,3 +35,5 @@ Source the `env.vim` file to setup `make` with automatic `gofmt`.
 ```vim
 :source env.vim
 ```
+
+[go-sdl2]: https://github.com/veandco/go-sdl2
