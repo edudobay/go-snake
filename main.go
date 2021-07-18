@@ -8,6 +8,7 @@ import (
 	"github.com/edudobay/go-snake/sdlutil"
 	"github.com/edudobay/go-snake/snake"
 	"github.com/veandco/go-sdl2/sdl"
+	"log"
 	"runtime"
 	"time"
 )
@@ -177,8 +178,12 @@ func main() {
 	}
 
 	resources := new(core.Resources)
-	resources.Init(sdlutil.SdlResource())
-	resources.Init(sdlutil.ImgResource())
+	if err := resources.Init(sdlutil.SdlResource()); err != nil {
+		log.Panicln(err)
+	}
+	if err := resources.Init(sdlutil.ImgResource()); err != nil {
+		log.Panicln(err)
+	}
 
 	defer resources.Dispose()
 

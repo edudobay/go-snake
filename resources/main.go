@@ -30,11 +30,17 @@ func imgResource() core.Resource {
 
 func main() {
 	resources := new(core.Resources)
-	resources.Init(new(Sdl))
-	resources.Init(imgResource())
-	resources.Init(core.DisposableResource(func() {
+	if err := resources.Init(new(Sdl)); err != nil {
+		fmt.Printf("error initializing SDL: %v\n", err)
+	}
+	if err := resources.Init(imgResource()); err != nil {
+		fmt.Printf("error initializing image: %v\n", err)
+	}
+	if err := resources.Init(core.DisposableResource(func() {
 		fmt.Println("just cleaning up the mess...")
-	}))
+	})); err != nil {
+		fmt.Printf("error initializing disposable: %v\n", err)
+	}
 
 	defer resources.Dispose()
 }
