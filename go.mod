@@ -1,6 +1,6 @@
 module github.com/edudobay/go-snake
 
-go 1.14
+go 1.16
 
 require (
 	github.com/alexflint/go-arg v1.0.0
