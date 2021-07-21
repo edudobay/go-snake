@@ -1,25 +1,19 @@
 package snake
 
+import "github.com/edudobay/go-snake/core"
+
 const BufSize = 16
 
 type signal struct{}
 
 type Board struct {
 	width, height int
+	system        core.System
 	cells         []BoardCellType
-	snakeCells    snakeCells
 	updates       chan signal
 }
 
 type BoardCellType int
-
-type snakeCell struct {
-	pos  int
-	next *snakeCell
-	prev *snakeCell
-}
-
-type snakeCells []int
 
 const (
 	BoardCellInvalid BoardCellType = iota
@@ -35,7 +29,10 @@ func CreateBoard(map_ GameMap) *Board {
 		cells[i] = cellTypeFromMapCell(mapCell)
 	}
 
-	return &Board{map_.width, map_.height, cells, snakeCells{}, make(chan signal, BufSize)}
+	system := core.System{}
+	system.AddEntity(NewSnake())
+
+	return &Board{map_.width, map_.height, system, cells, make(chan signal, BufSize)}
 }
 
 func (b Board) Width() int {
@@ -104,10 +101,12 @@ func (b *Board) Updates() <-chan signal {
 	return b.updates
 }
 
-// putSnake places the snake on the board; the head is placed on the (i, j)
+// PutSnake places the snake on the board; the head is placed on the (i, j)
 // position, and the tail is arranged linearly in the given direction from the
 // head.
 func (b *Board) PutSnake(i, j, size int, direction Direction) {
+	snake := b.Snake()
+
 	if b.CellTypeAt(i, j) != BoardCellFree {
 		panic("tried to place snake in a non-free position")
 	}
@@ -123,7 +122,7 @@ func (b *Board) PutSnake(i, j, size int, direction Direction) {
 		pos += b.step(direction)
 	}
 
-	b.snakeCells = cells
+	snake.Cells = cells
 	b.updated()
 }
 
@@ -134,11 +133,13 @@ func (b *Board) checkPos(pos int) {
 }
 
 func (b *Board) headPos() int {
-	return b.snakeCells[len(b.snakeCells)-1]
+	snake := b.Snake()
+	return snake.Cells[len(snake.Cells)-1]
 }
 
 func (b *Board) posFromHead(count int) int {
-	return b.snakeCells[(len(b.snakeCells)-1)-count]
+	snake := b.Snake()
+	return snake.Cells[(len(snake.Cells)-1)-count]
 }
 
 func (b *Board) growSnakeHead(direction Direction) {
@@ -146,18 +147,21 @@ func (b *Board) growSnakeHead(direction Direction) {
 	newHead := oldHead + b.step(direction)
 	b.checkPos(newHead)
 
-	b.snakeCells = append(b.snakeCells, newHead)
+	snake := b.Snake()
+	snake.Cells = append(snake.Cells, newHead)
 	b.cells[newHead] = BoardCellSnakeBody
 }
 
 func (b *Board) shrinkSnakeTail() {
-	if len(b.snakeCells) <= 1 {
+	snake := b.Snake()
+
+	if len(snake.Cells) <= 1 {
 		panic("tried to remove only cell")
 	}
-	oldEnd := b.snakeCells[0]
+	oldEnd := snake.Cells[0]
 	b.cells[oldEnd] = BoardCellFree
 
-	b.snakeCells = b.snakeCells[1:]
+	snake.Cells = snake.Cells[1:]
 }
 
 func (b *Board) GrowSnake(direction Direction) {
