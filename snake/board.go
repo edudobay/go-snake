@@ -29,7 +29,7 @@ func CreateBoard(map_ GameMap) *Board {
 		cells[i] = cellTypeFromMapCell(mapCell)
 	}
 
-	system := core.System{}
+	system := core.NewSystem()
 	system.AddEntity(NewSnake())
 
 	return &Board{map_.width, map_.height, system, cells, make(chan signal, BufSize)}

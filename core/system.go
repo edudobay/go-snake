@@ -13,8 +13,20 @@ type Entity struct {
 	Components map[string]Component
 }
 
-type System struct {
-	Entities []Entity
+type System interface {
+	AddEntity(entity Entity)
+	FindComponentsOfType(withType string) []Component
+	OneComponentOfType(withType string) Component
+}
+
+type systemImpl struct {
+	entities map[string]Entity
+}
+
+func NewSystem() System {
+	return &systemImpl{
+		entities: map[string]Entity{},
+	}
 }
 
 func NewEntity(id string) Entity {
@@ -38,14 +50,14 @@ func (e *Entity) AttachComponent(component Component) {
 	e.Components[component.Type()] = component
 }
 
-func (s *System) AddEntity(entity Entity) {
-	s.Entities = append(s.Entities, entity)
+func (s *systemImpl) AddEntity(entity Entity) {
+	s.entities[entity.Id] = entity
 }
 
-func (s *System) FindComponentsOfType(withType string) []Component {
-	components := make([]Component, 0, len(s.Entities))
+func (s *systemImpl) FindComponentsOfType(withType string) []Component {
+	components := make([]Component, 0, len(s.entities))
 
-	for _, entity := range s.Entities {
+	for _, entity := range s.entities {
 		if component := entity.GetComponent(withType); component != nil {
 			components = append(components, component)
 		}
@@ -54,10 +66,10 @@ func (s *System) FindComponentsOfType(withType string) []Component {
 	return components
 }
 
-func (s *System) OneComponentOfType(withType string) Component {
+func (s *systemImpl) OneComponentOfType(withType string) Component {
 	var found Component
 
-	for _, entity := range s.Entities {
+	for _, entity := range s.entities {
 		if found != nil {
 			panic(fmt.Sprintf("found more than one component of type '%s'", withType))
 		}
