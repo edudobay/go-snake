@@ -94,6 +94,9 @@ func (b Board) Center() (int, int) {
 }
 
 func (b *Board) updated() {
+	for _, component := range b.system.FindComponentsOfType(ComponentPosition) {
+		component.(*Position).UpdateBoard(b)
+	}
 	b.updates <- signal{}
 }
 
@@ -116,8 +119,10 @@ func (b *Board) PutSnake(i, j, size int, direction Direction) {
 
 	cells := make(snakeCells, size)
 
+	snakeEntity := b.system.FindEntityOrNilById(EntitySnake)
+	position := PositionComponent(snakeEntity)
 	for i := size - 1; i >= 0; i-- {
-		b.cells[pos] = BoardCellSnakeBody
+		position.UpdateCell(pos, BoardCellSnakeBody)
 		cells[i] = pos
 		pos += b.step(direction)
 	}
@@ -133,13 +138,17 @@ func (b *Board) checkPos(pos int) {
 }
 
 func (b *Board) headPos() int {
-	snake := b.Snake()
+	snake := SnakeComponent(b.system.FindEntityOrNilById(EntitySnake))
 	return snake.Cells[len(snake.Cells)-1]
 }
 
 func (b *Board) posFromHead(count int) int {
-	snake := b.Snake()
+	snake := SnakeComponent(b.system.FindEntityOrNilById(EntitySnake))
 	return snake.Cells[(len(snake.Cells)-1)-count]
+}
+
+func (b *Board) UpdateCell(cell int, cellType BoardCellType) {
+	b.cells[cell] = cellType
 }
 
 func (b *Board) growSnakeHead(direction Direction) {
@@ -147,19 +156,23 @@ func (b *Board) growSnakeHead(direction Direction) {
 	newHead := oldHead + b.step(direction)
 	b.checkPos(newHead)
 
-	snake := b.Snake()
+	snakeEntity := b.system.FindEntityOrNilById(EntitySnake)
+
+	snake := SnakeComponent(snakeEntity)
 	snake.Cells = append(snake.Cells, newHead)
-	b.cells[newHead] = BoardCellSnakeBody
+
+	PositionComponent(snakeEntity).UpdateCell(newHead, BoardCellSnakeBody)
 }
 
 func (b *Board) shrinkSnakeTail() {
-	snake := b.Snake()
+	snakeEntity := b.system.FindEntityOrNilById(EntitySnake)
+	snake := SnakeComponent(snakeEntity)
 
 	if len(snake.Cells) <= 1 {
 		panic("tried to remove only cell")
 	}
 	oldEnd := snake.Cells[0]
-	b.cells[oldEnd] = BoardCellFree
+	PositionComponent(snakeEntity).UpdateCell(oldEnd, BoardCellFree)
 
 	snake.Cells = snake.Cells[1:]
 }

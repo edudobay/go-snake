@@ -2,8 +2,6 @@ package snake
 
 import "github.com/edudobay/go-snake/core"
 
-const ComponentSnake = "snake"
-
 type snakeCell struct {
 	pos  int
 	next *snakeCell
@@ -17,8 +15,9 @@ type Snake struct {
 }
 
 func NewSnake() core.Entity {
-	snake := core.NewEntity("snake")
+	snake := core.NewEntity(EntitySnake)
 	snake.AttachComponent(&Snake{})
+	snake.AttachComponent(NewPosition())
 	return snake
 }
 
@@ -28,4 +27,8 @@ func (b *Board) Snake() *Snake {
 
 func (s *Snake) Type() string {
 	return ComponentSnake
+}
+
+func SnakeComponent(entity core.Entity) *Snake {
+	return entity.GetComponent(ComponentSnake).(*Snake)
 }

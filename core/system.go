@@ -17,6 +17,7 @@ type Entity interface {
 
 type System interface {
 	AddEntity(entity Entity)
+	FindEntityOrNilById(id string) Entity
 	FindComponentsOfType(withType string) []Component
 	OneComponentOfType(withType string) Component
 }
@@ -63,6 +64,10 @@ func (e *entityImpl) AttachComponent(component Component) {
 
 func (s *systemImpl) AddEntity(entity Entity) {
 	s.entities[entity.Id()] = entity
+}
+
+func (s *systemImpl) FindEntityOrNilById(id string) Entity {
+	return s.entities[id]
 }
 
 func (s *systemImpl) FindComponentsOfType(withType string) []Component {
