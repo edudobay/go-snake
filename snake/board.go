@@ -30,7 +30,6 @@ func CreateBoard(map_ GameMap) *Board {
 	}
 
 	system := core.NewSystem()
-	system.AddEntity(NewSnake())
 
 	return &Board{map_.width, map_.height, system, cells, make(chan signal, BufSize)}
 }
@@ -116,26 +115,12 @@ func (b *Board) Updates() <-chan signal {
 // position, and the tail is arranged linearly in the given direction from the
 // head.
 func (b *Board) PutSnake(i, j, size int, direction Direction) {
-	snake := b.Snake()
-
-	if b.CellTypeAt(i, j) != BoardCellFree {
+	headAddress := b.cellAddress(i, j)
+	if b.CellTypeAtCellAddress(headAddress) != BoardCellFree {
 		panic("tried to place snake in a non-free position")
 	}
 
-	head := b.cellAddress(i, j)
-	pos := head
-
-	cells := make(snakeCells, size)
-
-	snakeEntity := b.system.FindEntityOrNilById(EntitySnake)
-	position := PositionComponent(snakeEntity)
-	for i := size - 1; i >= 0; i-- {
-		position.UpdateCell(pos, BoardCellSnakeBody)
-		cells[i] = pos
-		pos += b.step(direction)
-	}
-
-	snake.Cells = cells
+	b.system.AddEntity(NewSnake(headAddress, size, direction, b))
 	b.updated()
 }
 

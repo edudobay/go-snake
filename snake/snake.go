@@ -14,11 +14,22 @@ type Snake struct {
 	Cells snakeCells
 }
 
-func NewSnake() core.Entity {
-	snake := core.NewEntity(EntitySnake)
-	snake.AttachComponent(&Snake{})
-	snake.AttachComponent(NewPosition())
-	return snake
+func NewSnake(headAddress, size int, direction Direction, b *Board) core.Entity {
+	position := NewPosition()
+
+	pos := headAddress
+	cells := make(snakeCells, size)
+
+	for i := size - 1; i >= 0; i-- {
+		position.UpdateCell(pos, BoardCellSnakeBody)
+		cells[i] = pos
+		pos += b.step(direction)
+	}
+
+	entity := core.NewEntity(EntitySnake)
+	entity.AttachComponent(&Snake{Cells: cells})
+	entity.AttachComponent(position)
+	return entity
 }
 
 func (b *Board) Snake() *Snake {
