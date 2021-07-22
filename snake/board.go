@@ -183,21 +183,19 @@ func (b *Board) GrowSnake(direction Direction) {
 }
 
 func (b *Board) MoveSnake(direction Direction) MoveResult {
-	newPos := b.headPos() + b.step(direction)
-
-	switch b.cells[newPos] {
-	case BoardCellSnakeBody:
-		if newPos == b.posFromHead(1) {
-			return MoveSelf
-		} else {
-			return MoveSelfCollide
-		}
-	case BoardCellWall:
-		return MoveWall
+	snakeEntity := b.snakeEntity()
+	snake := SnakeComponent(snakeEntity)
+	moveResult := snake.CheckCollision(direction, b)
+	if moveResult != MoveOk {
+		return moveResult
 	}
 
 	b.growSnakeHead(direction)
 	b.shrinkSnakeTail()
 	b.updated()
-	return MoveOk
+	return moveResult
+}
+
+func (b *Board) snakeEntity() core.Entity {
+	return b.system.FindEntityOrNilById(EntitySnake).(core.Entity)
 }
