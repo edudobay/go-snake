@@ -142,6 +142,14 @@ func (b *Board) MoveSnake(direction Direction) MoveResult {
 	return snake.MoveSnake(direction, b, position)
 }
 
+func (b *Board) AutoMoveSnake() MoveResult {
+	snakeEntity := b.snakeEntity()
+	snake := SnakeComponent(snakeEntity)
+	position := PositionComponent(snakeEntity)
+
+	return snake.AutoMove(b, position)
+}
+
 func (b *Board) snakeEntity() core.Entity {
 	return b.system.FindEntityOrNilById(EntitySnake).(core.Entity)
 }

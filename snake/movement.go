@@ -20,19 +20,9 @@ const (
 )
 
 func (game *Game) Move(direction Direction) {
-	if direction == NoDirection {
-		panic("invalid argument for Game.Move: NoDirection")
-	}
-
-	game.direction = direction
-
 	game.board.MoveSnake(direction)
 }
 
 func (game *Game) Tick() {
-	if game.direction == NoDirection {
-		panic("no direction during Game.Tick")
-	}
-
-	game.board.MoveSnake(game.direction)
+	game.board.AutoMoveSnake()
 }

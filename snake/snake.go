@@ -11,7 +11,8 @@ type snakeCell struct {
 type snakeCells []int
 
 type Snake struct {
-	Cells snakeCells
+	direction Direction
+	Cells     snakeCells
 }
 
 func NewSnake(headAddress, size int, direction Direction, b *Board) core.Entity {
@@ -27,7 +28,7 @@ func NewSnake(headAddress, size int, direction Direction, b *Board) core.Entity 
 	}
 
 	entity := core.NewEntity(EntitySnake)
-	entity.AttachComponent(&Snake{Cells: cells})
+	entity.AttachComponent(&Snake{Cells: cells, direction: direction})
 	entity.AttachComponent(position)
 	return entity
 }
@@ -49,6 +50,12 @@ func (s *Snake) posFromHead(count int) int {
 }
 
 func (s *Snake) MoveSnake(direction Direction, board *Board, position *Position) MoveResult {
+	if direction == NoDirection {
+		panic("invalid argument for Game.Move: NoDirection")
+	}
+
+	s.direction = direction
+
 	moveResult := s.CheckCollision(direction, board)
 	if moveResult != MoveOk {
 		return moveResult
@@ -60,6 +67,10 @@ func (s *Snake) MoveSnake(direction Direction, board *Board, position *Position)
 	board.updated()
 
 	return moveResult
+}
+
+func (s *Snake) AutoMove(board *Board, position *Position) MoveResult {
+	return s.MoveSnake(s.direction, board, position)
 }
 
 func (s *Snake) CheckCollision(moveDirection Direction, board *Board) MoveResult {
