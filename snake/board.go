@@ -66,6 +66,14 @@ func (b Board) towards(direction Direction, count int) int {
 	return b.step(direction) * count
 }
 
+func (b Board) CellTypeAtCellAddress(cell int) BoardCellType {
+	if cell < 0 || cell >= len(b.cells) {
+		panic("out of board bounds")
+	}
+
+	return b.cells[cell]
+}
+
 func (b Board) CellTypeAt(i, j int) BoardCellType {
 	if i < 0 || i >= b.height || j < 0 || j >= b.width {
 		panic("out of board bounds")
@@ -137,63 +145,16 @@ func (b *Board) checkPos(pos int) {
 	}
 }
 
-func (b *Board) headPos() int {
-	snake := SnakeComponent(b.system.FindEntityOrNilById(EntitySnake))
-	return snake.Cells[len(snake.Cells)-1]
-}
-
-func (b *Board) posFromHead(count int) int {
-	snake := SnakeComponent(b.system.FindEntityOrNilById(EntitySnake))
-	return snake.Cells[(len(snake.Cells)-1)-count]
-}
-
 func (b *Board) UpdateCell(cell int, cellType BoardCellType) {
 	b.cells[cell] = cellType
-}
-
-func (b *Board) growSnakeHead(direction Direction) {
-	oldHead := b.headPos()
-	newHead := oldHead + b.step(direction)
-	b.checkPos(newHead)
-
-	snakeEntity := b.system.FindEntityOrNilById(EntitySnake)
-
-	snake := SnakeComponent(snakeEntity)
-	snake.Cells = append(snake.Cells, newHead)
-
-	PositionComponent(snakeEntity).UpdateCell(newHead, BoardCellSnakeBody)
-}
-
-func (b *Board) shrinkSnakeTail() {
-	snakeEntity := b.system.FindEntityOrNilById(EntitySnake)
-	snake := SnakeComponent(snakeEntity)
-
-	if len(snake.Cells) <= 1 {
-		panic("tried to remove only cell")
-	}
-	oldEnd := snake.Cells[0]
-	PositionComponent(snakeEntity).UpdateCell(oldEnd, BoardCellFree)
-
-	snake.Cells = snake.Cells[1:]
-}
-
-func (b *Board) GrowSnake(direction Direction) {
-	b.growSnakeHead(direction)
-	b.updated()
 }
 
 func (b *Board) MoveSnake(direction Direction) MoveResult {
 	snakeEntity := b.snakeEntity()
 	snake := SnakeComponent(snakeEntity)
-	moveResult := snake.CheckCollision(direction, b)
-	if moveResult != MoveOk {
-		return moveResult
-	}
+	position := PositionComponent(snakeEntity)
 
-	b.growSnakeHead(direction)
-	b.shrinkSnakeTail()
-	b.updated()
-	return moveResult
+	return snake.MoveSnake(direction, b, position)
 }
 
 func (b *Board) snakeEntity() core.Entity {
